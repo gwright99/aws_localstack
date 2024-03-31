@@ -10,7 +10,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: argocd-dummy-trigger
-  namespace: lambda
+  namespace: localstack
 data:
   foo: "$(date)"
 EOF
