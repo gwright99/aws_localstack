@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Update and add a file in the manifests folder to force ArgoCD Resource Hook to trigger
+# echo $(date) > manifests/trigger_argo_refresh3.yaml
+# git add manifests/trigger_argo_refresh2.yaml 
+
+cat << EOF > manifests/argocd_dummy_trigger.yaml
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-dummy-trigger
+  namespace: lambda
+data:
+  foo: "$(date)"
+EOF
+
+git add manifests/argocd_dummy_trigger.yaml
