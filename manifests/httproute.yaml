@@ -26,3 +26,9 @@ spec:
           kind: Service
           group: ""
           port: 4566
+      # Sanity test <-- problem was header string mismatch
+      # backendRefs:
+      #   - name: mynginx
+      #     kind: Service
+      #     group: ""
+      #     port: 80
