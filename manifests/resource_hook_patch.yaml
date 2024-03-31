@@ -1,0 +1,64 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: patch-http-route
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+  namespace: localstack
+spec:
+  template:
+    spec:
+      serviceAccountName: patch-http-route
+      containers:
+      - name: patcher
+        image: nginx:latest
+        command: ["/bin/bash"]
+        args: ["-c", "/tmp/patch/patch.sh"]
+        volumeMounts:
+          - name: patch-http-route
+            mountPath: /tmp/patch/
+      volumes:
+        - name: patch-http-route
+          configMap:
+            defaultMode: 0777   # To defeat ReadOnly
+            name: patch-http-route
+            items:
+              - key: patch.sh
+                path: patch.sh
+      restartPolicy: Never
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: patch-http-route
+  namespace: localstack
+data:
+  purge.sh: |
+    apt update && apt install -y jq
+
+    APISERVER=https://kubernetes.default.svc
+    SERVICEACCOUNT=/var/run/secrets/kubernetes.io/serviceaccount
+    NAMESPACE=$(cat ${SERVICEACCOUNT}/namespace)
+    TOKEN=$(cat ${SERVICEACCOUNT}/token)
+    CACERT=${SERVICEACCOUNT}/ca.crt
+
+    # Get the secret so it can be patched into the HTTPRoute
+    SECRETNAME=header-secret
+    APIROOT=${APISERVER}/api/v1/namespaces/$NAMESPACE
+    SECRETVALUE=$(curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET $APIROOT/secrets/$SECRETNAME | jq '.data.header' | xargs echo | base64 -d)
+    
+    # PATCH (WORKS)
+    # REFERNECENS:
+    # - https://github.com/kubernetes/kubernetes/issues/68861
+    # - https://jsonpatch.com/
+    # - https://kubernetes.io/docs/tasks/manage-kubernetes-objects/update-api-object-kubectl-patch/
+    # - Merge Type really matters here
+    # Messy re: BASH interpolation of single quoted data. Have to close the string midway, interpolate, then reopen.
+    #  Ref: https://stackoverflow.com/questions/13799789/expansion-of-variables-inside-single-quotes-in-a-command-in-bash
+    curl --cacert ${CACERT} \
+        --header "Authorization: Bearer ${TOKEN}" \
+        --header "Content-Type: application/merge-patch+json" \
+        -X PATCH $APISERVER/apis/gateway.networking.k8s.io/v1/namespaces/localstack/httproutes/localstack \
+        --data '{"spec": {"rules": [{"matches":[{"headers": [{"name":"header-secret","value":"'"$SECRETVALUE"'","type":"Exact"}]}]}]}}'

@@ -1,0 +1,28 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  labels:
+    example: localstack
+  name: localstack
+  namespace: localstack
+spec:
+  hostnames:
+  - lambda.grahamwrightk8s.net
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: public-cloudflare
+    namespace: gloo-system
+  rules:
+    # https://docs.solo.io/gloo-gateway/v2/traffic-management/match/header/
+    - matches:
+      - headers:
+        - name: header-secret
+          value: REPLACE_ME_VIA_ARGO_RESOURCE_HOOK
+          type: Exact
+      backendRefs:
+        - name: localstack
+          kind: Service
+          group: ""
+          port: 8080
