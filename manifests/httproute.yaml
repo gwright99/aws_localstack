@@ -25,4 +25,4 @@ spec:
         - name: localstack
           kind: Service
           group: ""
-          port: 8080
+          port: 4566
