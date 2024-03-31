@@ -35,7 +35,7 @@ metadata:
   name: patch-http-route
   namespace: localstack
 data:
-  purge.sh: |
+  patch.sh: |
     apt update && apt install -y jq
 
     APISERVER=https://kubernetes.default.svc
