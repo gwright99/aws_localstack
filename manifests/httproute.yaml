@@ -8,7 +8,7 @@ metadata:
   namespace: localstack
 spec:
   hostnames:
-  - lambda.grahamwrightk8s.net
+  - localstack.grahamwrightk8s.net
   parentRefs:
   - group: gateway.networking.k8s.io
     kind: Gateway
