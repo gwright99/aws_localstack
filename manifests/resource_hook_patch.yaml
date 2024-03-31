@@ -59,6 +59,6 @@ data:
     #  Ref: https://stackoverflow.com/questions/13799789/expansion-of-variables-inside-single-quotes-in-a-command-in-bash
     curl --cacert ${CACERT} \
         --header "Authorization: Bearer ${TOKEN}" \
-        --header "Content-Type: application/merge-patch+json" \
+        --header "Content-Type: application/json-patch+json" \
         -X PATCH $APISERVER/apis/gateway.networking.k8s.io/v1/namespaces/localstack/httproutes/localstack \
-        --data '{"spec": {"rules": [{"matches":[{"headers": [{"name":"header-secret","value":"'"$SECRETVALUE"'","type":"Exact"}]}]}]}}'
+        --data '[ { "op": "replace", "path": "/spec/rules/1/matches/1/headers/1/value", "value":"'"$SECRETVALUE"'" }]'
