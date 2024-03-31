@@ -61,4 +61,4 @@ data:
         --header "Authorization: Bearer ${TOKEN}" \
         --header "Content-Type: application/json-patch+json" \
         -X PATCH $APISERVER/apis/gateway.networking.k8s.io/v1/namespaces/localstack/httproutes/localstack \
-        --data '[ { "op": "replace", "path": "/spec/rules/1/matches/1/headers/1/value", "value":"'"$SECRETVALUE"'" }]'
+        --data '[ { "op": "replace", "path": "/spec/rules/0/matches/0/headers/0/value", "value":"'"$SECRETVALUE"'" }]'
