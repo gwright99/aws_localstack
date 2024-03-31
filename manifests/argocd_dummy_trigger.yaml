@@ -5,4 +5,4 @@ metadata:
   name: argocd-dummy-trigger
   namespace: localstack
 data:
-  foo: "Sun 31 Mar 2024 07:26:31 AM EDT"
+  foo: "Sun 31 Mar 2024 07:43:32 AM EDT"
