@@ -12,8 +12,9 @@ def get_localstack_http_secret(localstack_http_header_secret_name, localstack_ht
     k8s_secret_command = f"kubectl get secret {localstack_http_header_secret_name} -n {localstack_http_header_secret_ns} -o jsonpath='{{.data}}' | jq '.header' | xargs"
     print(k8s_secret_command)
     http_header_secret_raw = subprocess.run(k8s_secret_command, capture_output=True, shell=True)
-    http_header_secret_decoded = base64.b64decode(http_header_secret_raw.stdout.decode("UTF8").strip()).decode("UTF8")
-    return http_header_secret_decoded
+    http_header_secret_decoded = base64.b64decode(http_header_secret_raw.stdout.decode("UTF8").strip())
+    http_header_secret_decoded_raw = http_header_secret_decoded.decode("UTF8").strip()
+    return http_header_secret_decoded_raw
 
 
 os.environ["AWS_ACCESS_KEY_ID"]="123"
