@@ -9,21 +9,28 @@ from mypy_boto3_ec2.client import EC2Client
 from mypy_boto3_ec2.literals import EC2ServiceName
 from mypy_boto3_s3.client import S3Client
 from mypy_boto3_s3.literals import S3ServiceName
+from mypy_boto3_dynamodb.client import DynamoDBClient
+from mypy_boto3_dynamodb.literals import DynamoDBServiceName
 
-from config.getsetvalues import endpoint_url
-
-
-@overload
-def get_client(service_name: EC2ServiceName, region_name: str, endpoint_url: Optional[str] = None) -> EC2Client: ...
+from utils.localstack import augment_aws_client_with_http_header
 
 
-@overload
-def get_client(service_name: S3ServiceName, region_name: str, endpoint_url: Optional[str] = None) -> S3Client: ...
+def get_ec2_client(service_name: EC2ServiceName, region_name: str, endpoint_url: Optional[str] = None) -> EC2Client:
+    client = boto3.client(service_name, region_name=region_name, endpoint_url=endpoint_url)
+    augment_aws_client_with_http_header(client)
+    return client
 
+def get_s3_client(service_name: S3ServiceName, region_name: str, endpoint_url: Optional[str] = None) -> S3Client:
+    client = boto3.client(service_name, region_name=region_name, endpoint_url=endpoint_url)
+    augment_aws_client_with_http_header(client)
+    return client
 
-@overload
-def get_client(service_name: ServiceName, region_name: str, endpoint_url: Optional[str] = None) -> BaseClient: ...
+def get_dynamodb_client(service_name: DynamoDBServiceName, region_name: str, endpoint_url: Optional[str] = None) -> DynamoDBClient:
+    client = boto3.client(service_name, region_name=region_name, endpoint_url=endpoint_url)
+    augment_aws_client_with_http_header(client)
+    return client
 
-
-def get_client(service_name: ServiceName, region_name: str, endpoint_url: Optional[str] = None) -> BaseClient:
-    return boto3.client(service_name, region_name=region_name, endpoint_url=endpoint_url)
+# def get_base_client(service_name: ServiceName, region_name: str, endpoint_url: Optional[str] = None) -> BaseClient:
+#     client = boto3.client(service_name, region_name=region_name, endpoint_url=endpoint_url)
+#     augment_aws_client_with_http_header(client)
+#     return client

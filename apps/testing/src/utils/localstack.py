@@ -1,9 +1,7 @@
 import json
-from typing import Optional
 
-from utils.aws_client import get_client
-from config.getsetvalues import localstack_boto3_header #HEADERSECRET
-from mypy_boto3.literals import ServiceName
+from config.logger import logger
+from config.getsetvalues import localstack_boto3_header
 
 
 # REFERNCE
@@ -13,19 +11,26 @@ from mypy_boto3.literals import ServiceName
 
 def _add_header(request, **kwargs):
     request.headers.add_header('header-secret', localstack_boto3_header) #HEADERSECRET)
-    print(request.headers)  # for debug
+    # print(request.headers)  # for debug
+    logger.debug(request.headers)
 
 
-def generate_aws_client(service_name: ServiceName, region_name: str, endpoint_url: Optional[str] = None):
+def augment_aws_client_with_http_header(client):
     '''Augment client calls to include the private header value required by the K8s HTTPRoute'''
-    client = get_client(service_name, region_name=region_name, endpoint_url=endpoint_url)
     event_system = client.meta.events
     event_system.register_first('before-sign.*.*', _add_header)
     return client
 
 
-def pp_response(payload: dict) -> None:
-    '''Pretty print the verbose json output'''
-    # `default=str` added to handle "datetime.datetime not JSON serializable" error
-    json_formatted_str = json.dumps(payload, indent=2, default=str)
-    print(json_formatted_str)
+# Using decorator for clean emission of payloads
+def pp_response(func):
+    def wrapper(*args, **kwargs):
+        # do something before func
+        result = func(*args, **kwargs)
+        # do something after func
+
+        # `default=str` added to handle "datetime.datetime not JSON serializable" error
+        if result is not None:
+            json_formatted_str = print(json.dumps(result, indent=2, default=str))
+            return result
+    return wrapper

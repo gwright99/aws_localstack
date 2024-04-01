@@ -20,6 +20,8 @@ Have Localstack running in local cluster. Want to have local Python (i.e. `boto3
 
 2. Design heavily influenced by [https://pypi.org/project/boto3-stubs/](https://pypi.org/project/boto3-stubs/) implementation suggestion (for minimal code and functional auto-completion).
 
+    1. Couldn't figure out how to make the whole `@overload` work so I just went caveman and have a constructor function for each type. Do not want to overly fight with getting the typing system perfect. It makes the code a bit more verbose but that's fine for now.
+
 
 ### Setup
 
