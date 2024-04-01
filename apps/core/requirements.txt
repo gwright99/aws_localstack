@@ -1,0 +1,7 @@
+boto3==1.34.74
+boto3-stubs
+boto3-stubs[ec2,s3,rds]
+#boto3-stubs[ec2,s3,rds,lambda,sqs,dynamo,cloudformation]
+#boto3-stubs[secretsmanager]
+# boto3-stubs[boto3]
+mypy_boto3_secretsmanager
