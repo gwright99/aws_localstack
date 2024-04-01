@@ -27,16 +27,3 @@ def get_client(service_name: ServiceName, region_name: str, endpoint_url: Option
 
 def get_client(service_name: ServiceName, region_name: str, endpoint_url: Optional[str] = None) -> BaseClient:
     return boto3.client(service_name, region_name=region_name, endpoint_url=endpoint_url)
-
-
-# type: S3Client, fully type annotated
-# All methods and attributes are auto-completed and type checked
-# s3_client = get_client("s3", endpoint_url=endpoint_url)
-
-# type: EC2Client, fully type annotated
-# All methods and attributes are auto-completed and type checked
-# ec2_client = get_client("ec2", endpoint_url=endpoint_url)
-
-# type: BaseClient, only basic type annotations
-# Dynamodb-specific methods and attributes are not auto-completed and not type checked
-# dynamodb_client = get_client("dynamodb", endpoint_url=endpoint_url)

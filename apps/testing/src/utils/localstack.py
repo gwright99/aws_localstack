@@ -2,7 +2,7 @@ import json
 from typing import Optional
 
 from utils.aws_client import get_client
-from config.getsetvalues import HEADERSECRET
+from config.getsetvalues import localstack_boto3_header #HEADERSECRET
 from mypy_boto3.literals import ServiceName
 
 
@@ -12,7 +12,7 @@ from mypy_boto3.literals import ServiceName
 
 
 def _add_header(request, **kwargs):
-    request.headers.add_header('header-secret', HEADERSECRET)
+    request.headers.add_header('header-secret', localstack_boto3_header) #HEADERSECRET)
     print(request.headers)  # for debug
 
 
@@ -26,5 +26,6 @@ def generate_aws_client(service_name: ServiceName, region_name: str, endpoint_ur
 
 def pp_response(payload: dict) -> None:
     '''Pretty print the verbose json output'''
-    json_formatted_str = json.dumps(payload, indent=2)
+    # `default=str` added to handle "datetime.datetime not JSON serializable" error
+    json_formatted_str = json.dumps(payload, indent=2, default=str)
     print(json_formatted_str)

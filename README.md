@@ -27,4 +27,5 @@ Have Localstack running in local cluster. Want to have local Python (i.e. `boto3
 2. `cd ~/localstack && source venv/bin/activate`
 3. `pip install -r apps/core/requirements.txt`
 4. Update `apps/testing/src/config/getsetvalues.py`
+5. Generate a bespoke shared password: `k get secret -n localstack header-secret -o json | jq --arg header "$(echo YOUR_BESPOKE_PASSWORD | base64 -w 0)" '.data["header"]=$header' | kubectl apply -f - `
 5. `python3 apps/testing/src/testing.py`
