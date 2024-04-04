@@ -22,7 +22,7 @@ spec:
           value: REPLACE_ME_VIA_ARGO_RESOURCE_HOOK
           type: Exact
       backendRefs:
-        - name: localstack
+        - name: localstack-pro
           kind: Service
           group: ""
           port: 4566

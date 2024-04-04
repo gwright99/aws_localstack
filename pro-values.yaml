@@ -1,0 +1,9 @@
+image:
+  repository: localstack/localstack-pro
+
+extraEnvVars:
+- name: LOCALSTACK_AUTH_TOKEN
+  valueFrom:
+    secretKeyRef:
+      name: localstack-license
+      key: LOCALSTACK_AUTH_TOKEN
