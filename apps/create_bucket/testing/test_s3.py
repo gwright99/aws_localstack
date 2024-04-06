@@ -5,6 +5,8 @@ sys.path.insert(0, '../')
 
 import pytest
 
+from time import sleep
+
 from mypy_boto3_ec2.client import EC2Client
 from mypy_boto3_s3.client import S3Client
 from mypy_boto3_dynamodb.client import DynamoDBClient
@@ -28,9 +30,9 @@ def helper_get_s3_buckets(s3_client: S3Client) -> ListBucketsOutputTypeDef:
 
 bucket_names = ["mybucket1", "mybucket2"]
 test_files = (
-    ("mybucket1", "/files/file1.txt", "ipsem"),
-    ("mybucket2", "/files/file2.txt", "lorem"),
-    ("mybucket1", "/logs/log1.log", "abc 123")
+    ("mybucket1", "files/file1.txt", "ipsem"),
+    ("mybucket2", "files/file2.txt", "lorem"),
+    ("mybucket1", "logs/log1.log", "abc 123")
 )
 
 
@@ -60,7 +62,7 @@ def generate_s3_buckets(s3_client: S3Client):
         
     yield
 
-    # Teardown
+    # # Teardown
     print(f"{__name__} teardown")
     for bucket_name in bucket_names:
         s3_client.delete_bucket(
@@ -83,7 +85,7 @@ def generate_s3_files(s3_client: S3Client, generate_s3_buckets):
 
     yield
 
-    # Teardown
+    # # Teardown
     for file in test_files:
         bucket, key, content = file
         s3_client.delete_object(Bucket=bucket, Key=key)
@@ -103,6 +105,8 @@ def test_confirm_files_exist(s3_client: S3Client, bucket, key, body):
     myfile: GetObjectOutputTypeDef = s3_client.get_object(Bucket=bucket, Key=key)
     print(myfile)
     assert myfile["Body"].read().decode('utf-8') == body
+
+    sleep(15)
 
 
 # @pp_response
