@@ -7,3 +7,8 @@ extraEnvVars:
     secretKeyRef:
       name: localstack-license
       key: LOCALSTACK_AUTH_TOKEN
+# https://docs.localstack.cloud/user-guide/state-management/persistence/#configuration
+- name: PERSISTENCE
+  value: "1"
+- name: SNAPSHOT_SAVE_STRATEGY
+  value: MANUAL
