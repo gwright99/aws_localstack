@@ -40,7 +40,7 @@ Total PITA to get this working. Solution(s):
 
     1. Use `venv` (_Yes it's not as cool as new packages like poetry, but I had enough problems already I didn't need to make this any harder than necessary_). Command `python -m venv venv`
 
-    2. Activate venv (`source venv/bin/activate` and install packages. Eg. `boto3-stubs[ec2,s3,rds,dynamodb,WHATEVER]`
+    2. Activate venv (`source venv/bin/activate`) and install packages. Eg. `boto3-stubs[ec2,s3,rds,dynamodb,WHATEVER]`
 
     3. Update VSCode `settings.json` with at least these:
         ```json
@@ -72,7 +72,8 @@ Decided to go with a classic `src` and `tests` peer folder structure split to se
 Like every attempt to use pytest in the past, with this sort of structure, ran into a plethora of IDE problems (import failures, autocompletion failures, cant-find-test failures, etc). Took the following steps to get things working.
 
 1. `echo PYTHONDONTWRITEBYTECODE=1 >> ~/.basrhc`
-    Got tired of `__pycache` folder cluttering up the project. Originally I tried to stop this in the `.py` files themselves but results were inconsistent: (_according to [StackOverflow](https://stackoverflow.com/questions/50752302/python3-pycache-generating-even-if-pythondontwritebytecode-1) this may be due to `python.testing.pytestEnabled` being active, causing VSCode to ignore. Dunno.)
+
+    Got tired of `__pycache` folder cluttering up the project. Originally I tried to stop this in the `.py` files themselves but results were inconsistent: (_according to [StackOverflow](https://stackoverflow.com/questions/50752302/python3-pycache-generating-even-if-pythondontwritebytecode-1) this may be due to `python.testing.pytestEnabled` being active, causing VSCode to ignore. Dunno._)
 
     ```python
     import sys
@@ -100,7 +101,7 @@ Like every attempt to use pytest in the past, with this sort of structure, ran i
 
 4. Manipulated path in actual test files so they could be run directly via `python -i <PATH/TO/TESTFILE>`.
 
-    Sometimes it's helpful to open an interactive session to troubleshoot a particular function. To avoid import errors, I added the following to the top of the test `.py` files. **NOTE:**_Since path is relative, you need to run from the same folder where the file is located (i.e. `cd app/create_bucket/tests && python3 -i test_s3.py` NOT `python3 <PATH>/test_s3.py`).
+    Sometimes it's helpful to open an interactive session to troubleshoot a particular function. To avoid import errors, I added the following to the top of the test `.py` files. **NOTE:**_Since path is relative, you need to run from the same folder where the file is located (i.e. `cd app/create_bucket/tests && python3 -i test_s3.py` NOT `python3 <PATH>/test_s3.py`_).
 
     ```python
     import sys
@@ -110,7 +111,8 @@ Like every attempt to use pytest in the past, with this sort of structure, ran i
 5. Run tests:
 
     ```bash
-    # I originally had to run pytest as a python module or else imports broke. With the conftest.py path manipulation, both options appeare via now.
+    # I originally had to run pytest as a python module or else imports broke. 
+    # With the conftest.py path manipulation, both options appeare via now.
 
     $ cd ~/localstack/apps/create_bucket
     $ python -m pytest -s -v 
