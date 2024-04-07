@@ -53,6 +53,16 @@ Actual Localstack(Pro) implemenation installed via Helm Chart for convenience.
     - See Development section to see how to get this secret into clients.
 
 
+### Git
+
+Project makes use of githooks to trigger ArgoCD. Configure the git repo to point to the bespoke `.githooks` folder:
+
+```bash
+git config --local core.hooksPath .githooks/
+chmod +x .githooks/pre-commit
+```
+
+
 ### Development (Intellisense & AutoComplete)
 
 Total PITA to get this working. Solution(s):
