@@ -1,7 +1,7 @@
 
 import sys
 sys.dont_write_bytecode = True
-sys.path.insert(0, '../')
+sys.path.insert(0, '../src')
 
 import pytest
 
@@ -106,7 +106,7 @@ def test_confirm_files_exist(s3_client: S3Client, bucket, key, body):
     print(myfile)
     assert myfile["Body"].read().decode('utf-8') == body
 
-    sleep(15)
+    # sleep(15)
 
 
 # @pp_response
