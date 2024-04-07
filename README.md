@@ -21,15 +21,36 @@ Have Localstack running in local cluster. Want to have local Python (i.e. `boto3
 2. Design heavily influenced by [https://pypi.org/project/boto3-stubs/](https://pypi.org/project/boto3-stubs/) implementation suggestion (for minimal code and functional auto-completion).
 
 
-### Setup
+### Infrastructure (Helm & ArgoCD)
 
-1. Get ArgoCD app running.
-2. `cd ~/localstack && source venv/bin/activate`
-3. `pip install -r apps/core/requirements.txt`
-4. Update `apps/testing/src/config/getsetvalues.py`
-5. Generate a bespoke shared password: `k get secret -n localstack header-secret -o json | jq --arg header "$(echo YOUR_BESPOKE_PASSWORD | base64 -w 0)" '.data["header"]=$header' | kubectl apply -f - `
-6. Function `get_localstack_http_secret` in `apps/create_bucket/src/config/getsetvalues.py` has logic to grab K8s secret value (via `kubectl`, which is present on the remote development system).
-7. Functions `_add_header` and `augment_aws_client_with_http_header` in `apps/create_bucket/src/utils/localstack.py` are used to dynamically patch and `boto3` client to automagically send the extra HTTP header requires to satisfy the API Gateway security check.
+Leveraging existing ArgoCD implementation in my K8s cluster to manage dynamic update of HTTPRoute with shared secret.
+Actual Localstack(Pro) implemenation installed via Helm Chart for convenience. 
+
+1. Helm Setup
+
+    ```bash
+    $ cd ~/localstack
+    $ helm install localstack localstack/localstack --version 0.6.11 --create-namespace --namespace localstack --values helm/pro-values.yaml
+
+    $ helm upgrade localstack-pro localstack/localstack --version 0.6.11 --namespace localstack --values pro-values.yaml
+    ```
+
+2. ArgoCD Setup
+
+    1. Created Localstack [ArgoCD Application in app-of-apps](https://github.com/gwright99/ci_cd_for_k8s/blob/main/charts/root-app/templates/localstack.yaml).
+
+    2. Created various manifests in `~/localstack/manifests` to support secret manipulation at run-time. TLDR ser
+        - Secret object
+        - Service Account & K8s (Cluster)Role (**NOTE:** _I initially used Role but swapped to ClusterRole due to problems encountering which, upon later reflection, I dont think was tied to K8s permissions. Could probably swap back at some point._)
+        - HTTPRoute for security screening
+        - Dummy object to be update by git pre-commit hooks (_to trigger ArgoCD syncing & Resource Hook execution).
+        - ArgoCD Resource Hook (_to patch HTTPRoute object in response to sync event_).
+
+3. Password update
+
+    - Generate a bespoke shared password: `k get secret -n localstack header-secret -o json | jq --arg header "$(echo YOUR_BESPOKE_PASSWORD | base64 -w 0)" '.data["header"]=$header' | kubectl apply -f - `
+
+    - See Development section to see how to get this secret into clients.
 
 
 ### Development (Intellisense & AutoComplete)
@@ -63,6 +84,12 @@ Total PITA to get this working. Solution(s):
     1. In `.py` file, import the service client. Eg. `from mypy_boto3_s3.client import S3Client`.
     
     2. Annotate your client variable with the type hint. This should allow VScode to start being helpful re: object attributes/methods/return types.
+
+3. Shared secret patching:
+
+    - Function `get_localstack_http_secret` in `apps/create_bucket/src/config/getsetvalues.py` has logic to grab K8s secret value (via `kubectl`, which is present on the remote development system).
+    
+    - Functions `_add_header` and `augment_aws_client_with_http_header` in `apps/create_bucket/src/utils/localstack.py` are used to dynamically patch and `boto3` client to automagically send the extra HTTP header requires to satisfy the API Gateway security check.
  
 
 ### Testing
@@ -101,7 +128,7 @@ Like every attempt to use pytest in the past, with this sort of structure, ran i
 
 4. Manipulated path in actual test files so they could be run directly via `python -i <PATH/TO/TESTFILE>`.
 
-    Sometimes it's helpful to open an interactive session to troubleshoot a particular function. To avoid import errors, I added the following to the top of the test `.py` files. **NOTE:**_Since path is relative, you need to run from the same folder where the file is located (i.e. `cd app/create_bucket/tests && python3 -i test_s3.py` NOT `python3 <PATH>/test_s3.py`_).
+    Sometimes it's helpful to open an interactive session to troubleshoot a particular function. To avoid import errors, I added the following to the top of the test `.py` files. **NOTE:** _Since path is relative, you need to run from the same folder where the file is located (i.e. `cd app/create_bucket/tests && python3 -i test_s3.py` NOT `python3 <PATH>/test_s3.py`_).
 
     ```python
     import sys
