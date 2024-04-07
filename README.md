@@ -145,7 +145,7 @@ Like every attempt to use pytest in the past, with this sort of structure, ran i
     sys.path.insert(0, '../src')
     ```
 
-5. Run tests:
+5. Run tests (see [How to invoke pytest](https://docs.pytest.org/en/8.0.x/how-to/usage.html) for more invocation details/options):
 
     ```bash
     # I originally had to run pytest as a python module or else imports broke. 
