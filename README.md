@@ -155,4 +155,8 @@ Like every attempt to use pytest in the past, with this sort of structure, ran i
     $ python -m pytest -s -v 
     # OR
     $ pytest -s -v
+
+    # If using `pytest.mark.parametrize` with `pytest.param` & `marks=pytest.mark.SOME_FLAG` 
+    # Run only those tests marked with the flag
+    $ pytest -v -m SOME_FLAG 
     ```
